@@ -21,11 +21,31 @@ const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: s
 };
 
 export const analyzePaper = async (file: File, settings: GameSettings): Promise<PaperAnalysisResponse> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API Key is missing. Please set process.env.API_KEY.");
-  }
+  
+  // =========================================================================================
+  // API KEY CONFIGURATION / API Key 配置
+  // 
+  // [Current Status]: Using Hardcoded Gemini Key provided by user.
+  // [当前状态]: 使用用户提供的硬编码 Gemini Key。
+  //
+  // [How to change to DeepSeek / OpenAI / Other APIs]:
+  // The current code uses the `@google/genai` SDK which ONLY works with Google Gemini models.
+  // If you want to use DeepSeek (which is OpenAI-compatible), you CANNOT use this SDK.
+  //
+  // You must rewrite this function to use standard `fetch` or the `openai` library:
+  // 
+  // const response = await fetch("https://api.deepseek.com/chat/completions", {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json", "Authorization": "Bearer YOUR_DEEPSEEK_KEY" },
+  //   body: JSON.stringify({ ... })
+  // });
+  //
+  // =========================================================================================
+  
+  // Replace this string if you want to use a different Gemini Key
+  const API_KEY = "AIzaSyCPVlvIzjkm0VyDPyCGaZoMo3oa8zTSZAc"; 
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
   
   const model = "gemini-2.5-flash"; 
   

@@ -80,8 +80,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ currentSettings,
 
           <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-500 mt-4 border border-gray-200">
             <i className="fas fa-info-circle mr-1"></i> 
-            <strong>Note:</strong> API Key configuration is handled via environment variables for security. 
-            Murasame cannot modify the world's source code from here.
+            <strong>Note:</strong> API Key is manually configured in <code>services/geminiService.ts</code>.
           </div>
 
         </div>
