@@ -29,7 +29,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ script, title, onExit })
   const [isAuto, setIsAuto] = useState(false);
   const [showLog, setShowLog] = useState(false);
   const [hideUI, setHideUI] = useState(false);
-  const [jumpKey, setJumpKey] = useState(0); // Used to trigger jump animation
+  
   
   const currentLine = script[currentIndex];
   const typingSpeed = 30; // ms per char
@@ -39,9 +39,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ script, title, onExit })
   const autoTimerRef = useRef<number | null>(null);
 
   // Trigger jump animation on new line
-  useEffect(() => {
-    setJumpKey(prev => prev + 1);
-  }, [currentIndex]);
+  
 
   // Character sprite handling based on emotion
   const getSpriteUrl = (emotion: string) => {
@@ -111,8 +109,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ script, title, onExit })
       {/* Character Layer */}
       {!hideUI && (
         <div 
-           key={jumpKey} // Re-trigger animation on key change
-           className={`absolute bottom-0 right-0 md:right-32 h-[90%] z-10 animate-jump-once`}
+           className={`absolute bottom-[20%] right-16 md:right-32 h-[85%] z-10 `}
         >
           <img 
             src={getSpriteUrl(currentLine.emotion)} 
