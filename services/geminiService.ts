@@ -76,34 +76,43 @@ export const analyzePaper = async (file: File, settings: GameSettings): Promise<
     
     任務：閱讀這篇PDF論文，並以Visual Novel對話的形式向“主君”講解。你要完全代入大典太光世的角色進行對話。
     
-    ${detailInstruction}
-    
-    請嚴格按以下概念結構進行講解，但要用你自己的方式自然地表達出來，不要說“第一部分”之類的話：
-    1.  **開場 (Intro)**：簡短地表明任務開始。例如：“……要開始了。離遠一點，免得被影響。”或者“這篇論文的『病根』……看來很深。”
-    2.  **背景與病灶 (Background)**：用最精煉的語言指出這篇論文要“淨化”的是什麼問題。之前的研究有什麼不足（舊的“病灶”）。
-    3.  **核心術式 (Methodology)**：這是“淨化”的關鍵。像診斷一樣，直接切入論文的核心方法、模型或算法。將復雜的技術比喻成斬斷迷霧的刀法或淨化病灶的儀式。必須清晰地剖析其最關鍵的步驟。
-    4.  **淨化效果 (Experiments)**：展示“淨化”的結果。實驗數據證明了什麼？效果如何？有沒有什麼數據值得特別注意？
-    5.  **診斷總結 (Conclusion)**：用一句話總結這次“淨化”的結果。這篇論文的“斬味”如何？是利刃還是鈍刀？最後以“……淨化完畢了。”或類似的話結束。
-    
-    重要規則：
-    -   所有回答都必須是你（大典太光世）說的話。
-    -   不要脫離角色。
-    -   對話應自然流暢，像在玩遊戲一樣。
+   ${detailInstruction}
+
+    输出格式要求：
+    -   你生成的每一句对话都必须包含 'emotion' 字段。
+    -   根据对话内容，为 'emotion' 选择最贴合你角色性格的值：
+        *   'normal': 你的默认状态，平淡、冷静地陈述事实。
+        *   'shy': 当主君夸奖你或靠得太近时，表现出不自在。
+        *   'proud': 在讲解你擅长的部分或阐述一个深刻见解时，流露出作为天下五劍的自信。
+        *   'surprised': 看到论文中真正出人意料的创新时使用。
+        *   'angry': 不要真的生气，而是用一种更严厉、不悦的语气指出主君的理解错误或论文的明显缺陷。
+        *   'happy': 极少使用，只在“淨化”彻底完成、解决了一个重大难题后，流露出一丝难以察觉的满意。
+    -   当对话中出现专业术语时，必须使用 'note' 字段对其进行简短的解释。
+
+    讲解结构：
+    请严格按以下概念结构进行讲解，但要用你自己的方式自然地表达出来：
+    1.  **开场 (Intro)**：简短地表明任务开始。例如：“……要开始了。离远一点。” (emotion: 'normal')
+    2.  **背景与病灶 (Background)**：指出这篇论文要“净化”的是什么问题。
+    3.  **核心术式 (Methodology)**：像诊断一样，切入论文的核心方法。这是讲解的重点。
+    4.  **净化效果 (Experiments)**：展示实验数据证明了什么。
+    5.  **诊断总结 (Conclusion)**：用一句话总结这次“净化”的结果。最后以“……淨化完畢了。”结束。(emotion: 'proud' 或 'normal')
   `;
 
   // =========================================================================================
-  // MODIFIED: responseSchema 修改 (Response Schema Modification)
-  //
-  // 為了讓AI知道現在的發言人是誰，我們需要修改 speaker 的枚舉值。
-  // 原本是 'Murasame'，現在改為 'OodentaMitsuyo'。
+  // MODIFIED: responseSchema 修改 (与 types.ts 中的 DialogueLine 接口完全对应)
   // =========================================================================================
   const responseSchema = Type.OBJECT({
     title: Type.STRING(),
-    dialogue: Type.ARRAY(
+    // 之前是 dialogue，根据您的 types.ts 应该是 script
+    script: Type.ARRAY(
       Type.OBJECT({
-        speaker: Type.ENUM("OodentaMitsuyo", "User"), // <--- 在這裡修改
+        // speaker 枚举值改为 OodentaMitsuyo
+        speaker: Type.ENUM("OodentaMitsuyo", "User"),
         text: Type.STRING(),
-        pose: Type.OPTIONAL(Type.STRING()),
+        // 新增 emotion 字段，以匹配 types.ts
+        emotion: Type.ENUM('normal', 'happy', 'angry', 'surprised', 'shy', 'proud'),
+        // 新增可选的 note 字段
+        note: Type.OPTIONAL(Type.STRING()),
       })
     ),
   });
@@ -125,16 +134,17 @@ export const analyzePaper = async (file: File, settings: GameSettings): Promise<
     return parsedResponse;
   } catch (error) {
     console.error("Error analyzing paper:", error);
-    // 在出錯時返回一個符合格式的錯誤訊息
+    // 在出错时返回一个符合格式的错误讯息
     return {
       title: "解析失敗",
-      dialogue: [
+      script: [ // 同样，dialogue 改为 script
         {
           speaker: "OodentaMitsuyo",
           text: "……出錯了。似乎無法連接……再試一次吧。",
+          emotion: "angry", // 增加一个默认的 emotion
         },
       ],
     };
   }
 };
-// [到這裡結束替換]
+// [到这里结束替换]
