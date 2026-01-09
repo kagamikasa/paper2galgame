@@ -39,7 +39,7 @@ const App: React.FC = () => {
       <div className="absolute inset-0 z-0">
         {currentState === AppState.GAME ? (
           <img 
-            src="https://pic.imgdd.cc/item/693be0a2824c3b667e8d9d59.png" 
+            src="https://i.postimg.cc/WzV4CBML/Camera_1040g3k831jsqb8okj2105pv7v723ltd28in0qe8.jpg" 
             alt="Game Background" 
             className="w-full h-full object-cover transition-opacity duration-1000"
           />
