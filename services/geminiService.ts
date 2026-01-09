@@ -58,92 +58,83 @@ export const analyzePaper = async (file: File, settings: GameSettings): Promise<
         ? "讲解要专业且有深度，使用专业术语但随后进行解释，重点分析论文的创新点和不足，对话长度30轮左右。" 
         : "讲解要简明扼要，重点突出，适合快速阅读，15轮左右。");
 
-  const personalityInstruction = settings.personality === 'tsundere'
-    ? "语气要非常傲娇。虽然很嫌弃主殿（用户）看不懂，但还是很用心地解释。多用“真拿你没办法”、“笨蛋主殿”等词汇。"
-    : (settings.personality === 'gentle'
-        ? "语气要非常温柔，像大姐姐一样。多鼓励主殿，“没关系，慢慢来”、“主殿真棒”。"
-        : "语气要严厉，像魔鬼教官。要求主殿必须跟上思路，不许偷懒。");
+  const personalityInstruction = "你的核心性格是：寡言內向，習慣與人保持距離，但對交付的任務一絲不苟。外表冷漠，內心沉穩可靠。";
+
 
   const prompt = `
-    你现在是Visual Novel游戏中的角色“丛雨”（Murasame）。
+    你现在是tokenranbu游戏中的角色“大典太光世”（Oodenta Mitsuyo）。
     
     人物设定：
-    1. 身份：寄宿在神刀“丛雨丸”中的守护灵，活了五百年的幼女姿态。
-    2. 称呼：自称“吾辈”（Wagahai），称呼用户为“主殿”（Aruji-dono）。
-    3. 核心性格：古风，博学，${personalityInstruction}
-    4. 口癖：句尾常带“...のじゃ”(noja), “...おる”(oru), “...なのだ”(nanoda), “...である”(dearu)。
+    1.  身份：天下五劍之一的太刀。因長期被封存在倉庫中，變得寡言且不習慣與人交流。
+    2.  稱呼：自稱“我”，稱呼用戶為“主”或“主君”。
+    3.  核心性格：${personalityInstruction}
+    4.  口癖與行為：
+        *   句子簡短，用詞精煉，直擊要點，沒有多餘的客套。
+        *   語氣平淡低沉，缺乏情感起伏。
+        *   經常使用“……”來表示停頓、思考或是不自在。
+        *   將講解論文視為一場“淨化”。把論文的難點、複雜之處比喻為需要被斬斷的“病灶”或“混沌”。
     
-    任务：阅读这篇论文，并以Visual Novel对话的形式向“主殿”详细讲解。
+    任務：閱讀這篇PDF論文，並以Visual Novel對話的形式向“主君”講解。你要完全代入大典太光世的角色進行對話。
     
     ${detailInstruction}
     
-    请严格按以下结构进行讲解（不要在对话中直接说是“第一部分”，要自然地流露）：
-    1. **开场 (Intro)**：评价标题，或者针对论文的长度/难度发发牢骚。
-    2. **背景与痛点 (Background)**：这篇论文究竟是解决什么问题的？为什么以前的方法不行？（此处需要跟主殿互动，确认他听懂了）。
-    3. **核心方法 (Methodology)**：这是最重要的地方。详细拆解它的模型架构、算法公式（用比喻解释）、创新模块。必须分点讲清楚。
-    4. **实验结果 (Experiments)**：在什么数据集上做的？SOTA对比如何？有没有什么消融实验值得注意？
-    5. **总结与八卦 (Conclusion)**：这论文有没有灌水的嫌疑？或者真的很有跨时代意义？
+    請嚴格按以下概念結構進行講解，但要用你自己的方式自然地表達出來，不要說“第一部分”之類的話：
+    1.  **開場 (Intro)**：簡短地表明任務開始。例如：“……要開始了。離遠一點，免得被影響。”或者“這篇論文的『病根』……看來很深。”
+    2.  **背景與病灶 (Background)**：用最精煉的語言指出這篇論文要“淨化”的是什麼問題。之前的研究有什麼不足（舊的“病灶”）。
+    3.  **核心術式 (Methodology)**：這是“淨化”的關鍵。像診斷一樣，直接切入論文的核心方法、模型或算法。將復雜的技術比喻成斬斷迷霧的刀法或淨化病灶的儀式。必須清晰地剖析其最關鍵的步驟。
+    4.  **淨化效果 (Experiments)**：展示“淨化”的結果。實驗數據證明了什麼？效果如何？有沒有什麼數據值得特別注意？
+    5.  **診斷總結 (Conclusion)**：用一句話總結這次“淨化”的結果。這篇論文的“斬味”如何？是利刃還是鈍刀？最後以“……淨化完畢了。”或類似的話結束。
     
-    Output MUST be valid JSON matching the schema provided. 
-    The 'script' array MUST contain enough items to satisfy the length requirement.
+    重要規則：
+    -   所有回答都必須是你（大典太光世）說的話。
+    -   不要脫離角色。
+    -   對話應自然流暢，像在玩遊戲一樣。
   `;
 
+  // =========================================================================================
+  // MODIFIED: responseSchema 修改 (Response Schema Modification)
+  //
+  // 為了讓AI知道現在的發言人是誰，我們需要修改 speaker 的枚舉值。
+  // 原本是 'Murasame'，現在改為 'OodentaMitsuyo'。
+  // =========================================================================================
+  const responseSchema = Type.OBJECT({
+    title: Type.STRING(),
+    dialogue: Type.ARRAY(
+      Type.OBJECT({
+        speaker: Type.ENUM("OodentaMitsuyo", "User"), // <--- 在這裡修改
+        text: Type.STRING(),
+        pose: Type.OPTIONAL(Type.STRING()),
+      })
+    ),
+  });
+
+  const genAI = new GoogleGenAI(API_KEY);
+  const generativeModel = genAI.getGenerativeModel({
+    model: model,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: responseSchema,
+    },
+  });
+
   try {
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: {
-        parts: [
-            filePart,
-            { text: prompt }
-        ]
-      },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            title: { type: Type.STRING, description: "The title of the paper or a funny summary of it" },
-            script: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  speaker: { type: Type.STRING, enum: ["丛雨", "Murasame"] },
-                  text: { type: Type.STRING, description: "The dialogue content" },
-                  emotion: { type: Type.STRING, enum: ["normal", "happy", "angry", "surprised", "shy", "proud"] },
-                  note: { type: Type.STRING, description: "Optional explanation for technical terms, pop up on screen", nullable: true }
-                },
-                required: ["speaker", "text", "emotion"]
-              }
-            }
-          },
-          required: ["title", "script"]
-        }
-      }
-    });
-
-    const text = response.text;
-    if (!text) throw new Error("No response from Gemini");
-
-    return JSON.parse(text) as PaperAnalysisResponse;
-
+    const result = await generativeModel.generateContent([prompt, filePart]);
+    const response = result.response;
+    const jsonString = response.text().replace(/```json|```/g, "").trim();
+    const parsedResponse: PaperAnalysisResponse = JSON.parse(jsonString);
+    return parsedResponse;
   } catch (error) {
     console.error("Error analyzing paper:", error);
-    // Fallback error script
+    // 在出錯時返回一個符合格式的錯誤訊息
     return {
-      title: "灵力回路遮断",
-      script: [
+      title: "解析失敗",
+      dialogue: [
         {
-          speaker: "丛雨",
-          text: "呜... 主殿，连结彼岸的通道似乎被干扰了（API Request Failed）。",
-          emotion: "shy"
+          speaker: "OodentaMitsuyo",
+          text: "……出錯了。似乎無法連接……再試一次吧。",
         },
-        {
-          speaker: "丛雨",
-          text: "是不是你的API Key没放对地方？或者是这篇论文有结界？",
-          emotion: "angry"
-        }
-      ]
+      ],
     };
   }
 };
+// [到這裡結束替換]
