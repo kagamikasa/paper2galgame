@@ -14,12 +14,12 @@ interface GameScreenProps {
 // ==========================================
 const CHARACTER_IMAGES: Record<string, string> = {
   // Using placehold.co for clear demonstration. Replace with real assets!
-  normal: 'https://pic.imgdd.cc/item/693bdfac824c3b667e8d9b1c.png',
-  happy: 'https://pic.imgdd.cc/item/693bdfac824c3b667e8d9b1d.png',
-  angry: 'https://pic.imgdd.cc/item/693bdf91824c3b667e8d9b00.png',
-  surprised: 'https://pic1.imgdb.cn/item/6938f3e507135a7c195e123c.png',
-  shy: 'https://pic.imgdd.cc/item/693bdf91824c3b667e8d9b02.png',
-  proud: 'https://pic.imgdd.cc/item/693be044824c3b667e8d9b4e.png',
+  normal: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
+  happy: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
+  angry: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
+  surprised: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
+  shy: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
+  proud: 'https://i.postimg.cc/QtfXYFxW/retouch-2026010921154256.png',
 };
 
 export const GameScreen: React.FC<GameScreenProps> = ({ script, title, onExit }) => {
